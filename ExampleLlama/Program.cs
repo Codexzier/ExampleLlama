@@ -8,12 +8,16 @@ namespace ExampleLlama
         private static ChatbotLlama _chatbotLlamaType2;
         private static ChatbotLlama _chatbotLlamaType1;
 
-        private static SpeechSynthesizer _synthesizer = new SpeechSynthesizer();
+        private static SpeechSynthesizer _synthesizer = new();
         
         static async Task Main(string[] args)
         {
             string modelPath = "C:/Users/Codexzier/.lmstudio/models/lmstudio-community/Phi-3.1-mini-128k-instruct-GGUF/Phi-3.1-mini-128k-instruct-Q4_K_M.gguf";
 
+            _synthesizer.Rate = 2;
+            
+            _synthesizer.Speak("Hallo ich bin eine Künstliche Intelligenz.");
+            
             StartChatBotTyp1(modelPath);
             
             
@@ -30,6 +34,7 @@ namespace ExampleLlama
                 Console.ForegroundColor = ConsoleColor.White;
                 await _chatbotLlamaType1.Chat(userInput);
                 
+                _synthesizer.Speak(_chatbotLlamaType1.GetLastAnswer());
                 Console.WriteLine();
 
                 Console.ForegroundColor = ConsoleColor.Green;
@@ -53,6 +58,7 @@ namespace ExampleLlama
             systemRoleDescription.AppendLine("Aouda ist hilfsbereit, ist kindlich, ihre Antworten entsprechen einem Kind von 10 Jahren.");
             systemRoleDescription.AppendLine("Aouda ist ehrlich, ist jedoch etwas ausfallend in ihrere Beschreibt die etwas fantastisch wirken!");
             systemRoleDescription.AppendLine("Aouda ist auch eine Abenteuerin und fügt bei ihren Antworten noch zwei bis drei Sätze aus einem bekannten Abenteuer hinzu");
+            systemRoleDescription.AppendLine("Aouda antwortet in ein bis zwei kurzen Sätzen.");
             
             var historie = _chatbotLlamaType1.LoadChatHistory(true, systemRoleDescription.ToString());
             foreach (var chatItem in historie)
@@ -70,9 +76,6 @@ namespace ExampleLlama
             {
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write(text);
-                
-                // 
-                _synthesizer.Speak(text);
             };
         }
         

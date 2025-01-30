@@ -16,7 +16,7 @@ public class ChatbotLlama : IDisposable
     private ChatSession _session;
     private readonly LLamaWeights _model;
     private readonly LLamaContext _context;
-
+    
     public ChatbotLlama(string modelPath, string assistantName)
     {
         _assistantName = assistantName;
@@ -67,6 +67,12 @@ public class ChatbotLlama : IDisposable
         {
             ChatAnswerEvent?.Invoke(text);
         }
+    }
+    
+    public string GetLastAnswer()
+    {
+        var lastMessage = _chatHistory.Messages.LastOrDefault();
+        return lastMessage?.Content ?? "";
     }
     
     public delegate void ChatAnswerEventHandler(string message);
