@@ -7,17 +7,19 @@ namespace ExampleLlama;
 
 public class ChatbotLlama : IDisposable
 {
-    private readonly string _fileHistorie = $"{Environment.CurrentDirectory}/chatHistory.txt";
+    private readonly string _assistantName;
+    private readonly string _fileHistorie = $"{Environment.CurrentDirectory}/chatHistory";
     
     private readonly InteractiveExecutor _executor;
     private ChatHistory _chatHistory;
-    private InferenceParams _inferenceParams;
+    private readonly InferenceParams _inferenceParams;
     private ChatSession _session;
     private readonly LLamaWeights _model;
     private readonly LLamaContext _context;
 
-    public ChatbotLlama(string modelPath)
+    public ChatbotLlama(string modelPath, string assistantName)
     {
+        _assistantName = assistantName;
         var parameters = new ModelParams(modelPath)
         {
             ContextSize = 1024, // The longest length of chat as memory.
@@ -36,11 +38,16 @@ public class ChatbotLlama : IDisposable
         };
     }
     
+    private string GetFileName()
+    {
+        return $"{_fileHistorie}_{_assistantName}.json";
+    }
+    
     public List<ChatItem> LoadChatHistory(bool loadFromFile = true, string systemRoleDescription = "")
     {
-        if (loadFromFile && File.Exists(_fileHistorie))
+        if (loadFromFile && File.Exists(GetFileName()))
         {
-            var chatHistory = File.ReadAllText(_fileHistorie);
+            var chatHistory = File.ReadAllText(GetFileName());
             _chatHistory = ChatHistory.FromJson(chatHistory) ?? new ChatHistory();
         }
         else
@@ -51,8 +58,7 @@ public class ChatbotLlama : IDisposable
             
         _session = new ChatSession(_executor, _chatHistory); 
         
-        List<ChatItem> chatItems = _chatHistory.Messages.Select(s => new ChatItem(s.AuthorRole.ToString(), s.Content)).ToList();
-        return chatItems;
+        return _chatHistory.Messages.Select(s => new ChatItem(s.AuthorRole.ToString(), s.Content)).ToList();
     }
     
     public async Task Chat(string userInput)
@@ -74,12 +80,6 @@ public class ChatbotLlama : IDisposable
 
     public void SaveChatHistory()
     {
-        File.WriteAllText(_fileHistorie, _chatHistory.ToJson());
+        File.WriteAllText(GetFileName(), _chatHistory.ToJson());
     }
-}
-
-public class ChatItem(string role, string message)
-{
-    public string Role { get; } = role;
-    public string Message { get; } = message;
 }

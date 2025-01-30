@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Speech.Synthesis;
+using System.Text;
 
 namespace ExampleLlama
 {
@@ -7,6 +8,8 @@ namespace ExampleLlama
         private static ChatbotLlama _chatbotLlamaType2;
         private static ChatbotLlama _chatbotLlamaType1;
 
+        private static SpeechSynthesizer _synthesizer = new SpeechSynthesizer();
+        
         static async Task Main(string[] args)
         {
             string modelPath = "C:/Users/Codexzier/.lmstudio/models/lmstudio-community/Phi-3.1-mini-128k-instruct-GGUF/Phi-3.1-mini-128k-instruct-Q4_K_M.gguf";
@@ -42,7 +45,7 @@ namespace ExampleLlama
 
         private static void StartChatBotTyp1(string modelPath)
         {
-            _chatbotLlamaType1 = new ChatbotLlama(modelPath);
+            _chatbotLlamaType1 = new ChatbotLlama(modelPath, "Aouda");
             
             var systemRoleDescription = new StringBuilder();
             // Aouda
@@ -67,6 +70,9 @@ namespace ExampleLlama
             {
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write(text);
+                
+                // 
+                _synthesizer.Speak(text);
             };
         }
         
